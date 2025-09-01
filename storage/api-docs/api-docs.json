@@ -1,0 +1,1974 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "HiriBot HR API",
+        "description": "HiriBot İK (HRIS) platformunun REST API'si. Çalışan yönetimi, izin & devamsızlık, bordro, işe alım, toplantı planlama/kayıt ve denetim logları gibi modüller için güvenli entegrasyon sağlar.",
+        "contact": {
+            "name": "HiriBot API Destek",
+            "email": "support@hiri.ai"
+        },
+        "license": {
+            "name": "HiriBot Proprietary License",
+            "url": "https://hiri.ai/legal/api-license"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://meetapi.test/api",
+            "description": "Prod API Sunucusu"
+        },
+        {
+            "url": "https://staging.hiribot.hiri.ai/api",
+            "description": "Staging API Sunucusu"
+        },
+        {
+            "url": "http://hiribot.local/api",
+            "description": "Yerel Geliştirme Sunucusu"
+        },
+        {
+            "url": "https://prodapiv2.cmapps.eu"
+        }
+    ],
+    "paths": {
+        "/v1/meetings": {
+            "get": {
+                "tags": [
+                    "Meetings"
+                ],
+                "summary": "Toplantıları listele (sayfalı)",
+                "description": "Meeting kayıtlarını sayfalı olarak döner.",
+                "operationId": "meetingsIndex",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Sayfa numarası",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Sayfa başı kayıt",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "example": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MeetingPage"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {
+                        "apiKeyAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Meetings"
+                ],
+                "summary": "Toplantı oluştur",
+                "operationId": "meetingsStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MeetingInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Oluşturuldu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Meeting"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Doğrulama Hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {
+                        "apiKeyAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/meetings/{id}": {
+            "get": {
+                "tags": [
+                    "Meetings"
+                ],
+                "summary": "Tek toplantıyı getir",
+                "operationId": "meetingsShow",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Meeting UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Meeting"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Bulunamadı"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {
+                        "apiKeyAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Meetings"
+                ],
+                "summary": "Toplantıyı güncelle",
+                "operationId": "meetingsUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Meeting UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MeetingInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Güncellendi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Meeting"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Bulunamadı"
+                    },
+                    "422": {
+                        "description": "Doğrulama Hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {
+                        "apiKeyAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Meetings"
+                ],
+                "summary": "Toplantıyı sil",
+                "description": "Soft delete uygular.",
+                "operationId": "meetingsDestroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Meeting UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Silindi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "message": "Silindi."
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Bulunamadı"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {
+                        "apiKeyAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Yeni kullanıcı kaydı oluşturur.",
+                "description": "Yeni kullanıcı kaydı yapar ve JWT token ile birlikte geri döner.",
+                "operationId": "authRegister",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "example": "cmappsdev"
+                                    },
+                                    "firstname": {
+                                        "type": "string",
+                                        "example": "Ali"
+                                    },
+                                    "lastname": {
+                                        "type": "string",
+                                        "example": "Veli"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ali@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "5551112233"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "12345678"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "İstanbul, Türkiye"
+                                    },
+                                    "cmappsID": {
+                                        "type": "string",
+                                        "example": "CM123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Kullanıcı başarıyla oluşturuldu.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "username": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Geçersiz veri",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Veri doğrulama hatası."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sunucuda bir hata oluştu."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Kullanıcı girişi yapar (JWT + 2FA destekli)",
+                "description": "Email, telefon veya cmappsID ile giriş yapılır. 2FA aktifse pending token döner, değilse token seti ile tam oturum sağlanır.",
+                "operationId": "authLogin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email_or_phone_or_cmappsID",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email_or_phone_or_cmappsID": {
+                                        "type": "string",
+                                        "example": "user1@cmapps.co"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "cmapps123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Başarılı giriş veya 2FA doğrulama bekleniyor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "description": "2FA aktif: pending token ile dönüş",
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "success"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "2FA doğrulama gerekiyor."
+                                                },
+                                                "data": {
+                                                    "properties": {
+                                                        "user": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "User 1"
+                                                                },
+                                                                "email": {
+                                                                    "type": "string",
+                                                                    "format": "email"
+                                                                },
+                                                                "phone": {
+                                                                    "type": "string"
+                                                                },
+                                                                "avatar": {
+                                                                    "type": "string",
+                                                                    "format": "uri"
+                                                                },
+                                                                "authority": {
+                                                                    "type": "string",
+                                                                    "example": "admin"
+                                                                },
+                                                                "two_factor_enabled": {
+                                                                    "type": "boolean",
+                                                                    "example": true
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "pending_token": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "description": "2FA kapalı: access + refresh token ile dönüş",
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "success"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Giriş başarılı!"
+                                                },
+                                                "data": {
+                                                    "properties": {
+                                                        "user": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "email": {
+                                                                    "type": "string",
+                                                                    "format": "email"
+                                                                },
+                                                                "phone": {
+                                                                    "type": "string"
+                                                                },
+                                                                "avatar": {
+                                                                    "type": "string",
+                                                                    "format": "uri"
+                                                                },
+                                                                "authority": {
+                                                                    "type": "string",
+                                                                    "example": "admin"
+                                                                },
+                                                                "two_factor_enabled": {
+                                                                    "type": "boolean",
+                                                                    "example": false
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "access_token": {
+                                                            "type": "string"
+                                                        },
+                                                        "refresh_token": {
+                                                            "type": "string"
+                                                        },
+                                                        "token_type": {
+                                                            "type": "string",
+                                                            "example": "bearer"
+                                                        },
+                                                        "expires_in": {
+                                                            "type": "integer",
+                                                            "example": 3600
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Giriş başarısız (hatalı şifre veya kullanıcı bulunamadı).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Şifre eşleşmedi!"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "reason": {
+                                                    "type": "string",
+                                                    "example": "invalid_password"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Hesap pasif veya yasaklı.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hesabınız devre dışı bırakılmış!"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "reason": {
+                                                    "type": "string",
+                                                    "example": "account_inactive"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Şifre sıfırlama bağlantısı gönderir",
+                "description": "Kullanıcının e-posta adresine şifre sıfırlama bağlantısı gönderir.",
+                "operationId": "forgotPassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Şifre sıfırlama bağlantısı gönderildi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi."
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Geçersiz e-posta adresi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doğrulama hatası oluştu."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Yeni şifre belirleme",
+                "description": "Kullanıcı, şifre sıfırlama bağlantısındaki token ve e-posta bilgisiyle yeni şifresini belirler.",
+                "operationId": "resetPassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "token",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "description": "Şifresi sıfırlanacak kullanıcının e-posta adresi",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "token": {
+                                        "description": "Şifre sıfırlama bağlantısındaki token",
+                                        "type": "string",
+                                        "example": "abc123token"
+                                    },
+                                    "password": {
+                                        "description": "Yeni şifre",
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8,
+                                        "example": "entekas123"
+                                    },
+                                    "password_confirmation": {
+                                        "description": "Yeni şifre tekrarı",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "entekas123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Şifre başarıyla sıfırlandı.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Şifre başarıyla sıfırlandı."
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Token geçersiz veya süresi dolmuş.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş!"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kullanıcı bulunamadı.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kullanıcı bulunamadı."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Doğrulama hatası.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doğrulama hatası oluştu."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Giriş yapan kullanıcının bilgilerini getirir.",
+                "operationId": "authMe",
+                "responses": {
+                    "200": {
+                        "description": "Başarılı"
+                    },
+                    "401": {
+                        "description": "Yetkisiz veya token geçersiz"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Kullanıcı çıkışı yapar.",
+                "operationId": "authLogout",
+                "responses": {
+                    "200": {
+                        "description": "Başarıyla çıkış yapıldı"
+                    },
+                    "500": {
+                        "description": "Çıkış yapılamadı"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Token yeniler.",
+                "operationId": "authRefresh",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "refresh_token"
+                                ],
+                                "properties": {
+                                    "refresh_token": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token yenilendi"
+                    },
+                    "400": {
+                        "description": "Refresh token gönderilmedi"
+                    },
+                    "401": {
+                        "description": "Geçersiz refresh token"
+                    },
+                    "404": {
+                        "description": "Kullanıcı bulunamadı"
+                    }
+                }
+            }
+        },
+        "/v1/auth/google-login": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Google Access Token ile giriş yapar.",
+                "description": "Google Access Token ile mevcut kayıtlı kullanıcı giriş yapar. Kullanıcı bulunamazsa hata döner.",
+                "operationId": "googleLogin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "access_token"
+                                ],
+                                "properties": {
+                                    "access_token": {
+                                        "type": "string",
+                                        "example": "ya29.a0AfH6SMCQmhz6Xh3P0H...GoogleAccessToken"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Google ile giriş başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Google ile giriş başarılı!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "9eaa92fa-9066-41f2-84cc-bfb248b27d7a"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "User 1"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "user1@entekas.com"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "0533 123 45 67"
+                                                        },
+                                                        "avatar": {
+                                                            "type": "string",
+                                                            "format": "uri",
+                                                            "example": "https://example.com/avatar.png"
+                                                        },
+                                                        "authority": {
+                                                            "type": "string",
+                                                            "example": "customer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "access_token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGci..."
+                                                },
+                                                "refresh_token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGci..."
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "bearer"
+                                                },
+                                                "expires_in": {
+                                                    "type": "integer",
+                                                    "example": 3600
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Geçersiz Google Access Token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Google kimlik doğrulaması başarısız oldu."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Hesap devre dışı bırakılmış veya yasaklı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hesabınız devre dışı bırakılmış."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kullanıcı bulunamadı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sistemde kayıtlı e-posta bulunamadı, kayıt olunuz."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "reason": {
+                                                    "type": "string",
+                                                    "example": "user_not_found"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/2fa/enable": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "İki faktörlü kimlik doğrulamasını (2FA) aktif eder.",
+                "description": "Kullanıcıdan Google Authenticator kodu ister ve doğrulama başarılı olursa 2FA aktif edilir.",
+                "operationId": "enableTwoFactor",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "2FA başarıyla aktif edildi.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "İki faktörlü kimlik doğrulama aktif edildi!"
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Geçersiz 2FA kodu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Geçersiz 2FA kodu."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/auth/2fa/disable": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "İki faktörlü kimlik doğrulamasını (2FA) devre dışı bırakır.",
+                "description": "Kullanıcıdan Google Authenticator kodu ister ve doğrulama başarılı olursa 2FA iptal edilir.",
+                "operationId": "disableTwoFactor",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "654321"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "2FA başarıyla devre dışı bırakıldı.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "İki faktörlü kimlik doğrulama başarıyla devre dışı bırakıldı!"
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Geçersiz 2FA kodu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Geçersiz 2FA kodu."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "2FA zaten aktif değil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "İki faktörlü kimlik doğrulama zaten aktif değil."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/auth/2fa/qrcode": {
+            "get": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "2FA için QR kodu ve gizli anahtarı getirir.",
+                "description": "Kullanıcının Google Authenticator uygulamasında kullanması için QR kodu ve secret anahtarı döner.",
+                "operationId": "getTwoFactorQrCode",
+                "responses": {
+                    "200": {
+                        "description": "QR kod ve secret başarıyla getirildi.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "2FA QR kodu başarıyla oluşturuldu!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "qr_code": {
+                                                    "type": "string",
+                                                    "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+                                                },
+                                                "secret": {
+                                                    "type": "string",
+                                                    "example": "JBSWY3DPEHPK3PXP"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Yetkilendirme hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token bulunamadı."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/auth/verify-2fa": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "2FA kodu doğrulaması yapar ve yeni token ile kullanıcı bilgisi döner.",
+                "operationId": "authVerify2FA",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "2FA doğrulama başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "2FA doğrulaması başarılı!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "9eaa92fa-9066-41f2-84cc-bfb248b27d7a"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "User 1"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "user1@entekas.com"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "0533 731 89 67"
+                                                        },
+                                                        "avatar": {
+                                                            "type": "string",
+                                                            "format": "uri",
+                                                            "example": "https://www.gravatar.com/avatar/3cb671e3e55b1919b5a0e98a3b9db823?s=200&d=identicon"
+                                                        },
+                                                        "authority": {
+                                                            "type": "string",
+                                                            "example": "admin"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "access_token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGci..."
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "bearer"
+                                                },
+                                                "expires_in": {
+                                                    "type": "integer",
+                                                    "example": 3600
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Geçersiz kod",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kod doğrulanamadı!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/auth/integration-login": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "x-api-key ve x-api-secret ile access_token alır (ek entegrasyonlar için).",
+                "description": "Belirlenen API key ve API secret ile access_token üretir. Giriş yapmaya gerek yoktur. Banlı veya kapalı hesaplar token alamaz.",
+                "operationId": "integrationLogin",
+                "parameters": [
+                    {
+                        "name": "x-api-key",
+                        "in": "header",
+                        "description": "Kullanıcının API anahtarı",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AbCdEfGh1234567890"
+                        }
+                    },
+                    {
+                        "name": "x-api-secret",
+                        "in": "header",
+                        "description": "Kullanıcının API secret anahtarı",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "s3cr3tK3y9876543210"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Access token başarıyla üretildi.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Geçersiz API bilgileri (key veya secret hatalı).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Geçersiz API bilgileri."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Kullanıcı hesabı devre dışı bırakılmış veya yasaklanmış.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hesabınız devre dışı bırakılmış."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/api-credentials": {
+            "post": {
+                "tags": [
+                    "Kimlik Doğrulama İşlemleri"
+                ],
+                "summary": "Giriş yapan kullanıcı için yeni API Key ve Secret üretir.",
+                "description": "Bu endpoint, JWT token ile kimlik doğrulaması yapılmış kullanıcıya yeni bir API Key ve Secret üretir.",
+                "operationId": "generateApiCredentials",
+                "responses": {
+                    "200": {
+                        "description": "API Key ve Secret başarıyla üretildi.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "api_key": {
+                                                    "type": "string",
+                                                    "example": "8f5a8d3b7f5c4e12b9b1c5a9d2e8f3c7"
+                                                },
+                                                "api_secret": {
+                                                    "type": "string",
+                                                    "example": "f4e8d3b7c5a9d2e8f3c78f5a8d3b7f5c4e12b9b1c5a9d2e8f3c78f5a"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "API Key ve Secret başarıyla oluşturuldu!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Yetkisiz erişim.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kullanıcı bulunamadı!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Sunucu hatası.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "API bilgileri üretilirken hata oluştu."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Exception mesajı"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Meeting": {
+                "required": [
+                    "id",
+                    "link",
+                    "type",
+                    "start_at",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "7d3c1c7e-02aa-4a4d-bb13-6a6c1a3f4c1a"
+                    },
+                    "link": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 1024,
+                        "example": "https://meet.google.com/abc-defg-hij"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "meet",
+                            "teams",
+                            "zoom"
+                        ],
+                        "example": "meet"
+                    },
+                    "start_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-01T12:00:00Z"
+                    },
+                    "end_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-01T13:00:00Z",
+                        "nullable": true
+                    },
+                    "record_path": {
+                        "type": "string",
+                        "maxLength": 2048,
+                        "example": "/records/2025/09/01/abc123.mp4",
+                        "nullable": true
+                    },
+                    "log": {
+                        "type": "object",
+                        "example": {
+                            "scheduled_by": "a8c2...",
+                            "status": "queued"
+                        },
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "MeetingInput": {
+                "required": [
+                    "link",
+                    "type",
+                    "start_at"
+                ],
+                "properties": {
+                    "link": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 1024,
+                        "example": "https://meet.google.com/abc-defg-hij"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "meet",
+                            "teams",
+                            "zoom"
+                        ],
+                        "example": "teams"
+                    },
+                    "start_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-01T12:00:00Z"
+                    },
+                    "end_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-01T13:30:00Z",
+                        "nullable": true
+                    },
+                    "record_path": {
+                        "type": "string",
+                        "maxLength": 2048,
+                        "example": "https://cdn.hiribot.hiri.ai/recs/abc.mp4",
+                        "nullable": true
+                    },
+                    "log": {
+                        "type": "object",
+                        "example": {
+                            "agent": "recorder-1",
+                            "priority": 5
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ValidationError": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "The given data was invalid."
+                    },
+                    "errors": {
+                        "type": "object",
+                        "example": {
+                            "link": [
+                                "The link field must be a valid URL."
+                            ]
+                        },
+                        "additionalProperties": {
+                            "schema": "MeetingController",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "MeetingController": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "MeetingPage": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Meeting"
+                        }
+                    },
+                    "first_page_url": {
+                        "type": "string"
+                    },
+                    "from": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "last_page": {
+                        "type": "integer"
+                    },
+                    "last_page_url": {
+                        "type": "string"
+                    },
+                    "links": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "next_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "prev_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "to": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 42
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Bearer token ile yetkilendirme. Örn: 'Authorization: Bearer {token}'",
+                "bearerFormat": "Sanctum/JWT",
+                "scheme": "bearer"
+            },
+            "apiKeyAuth": {
+                "type": "apiKey",
+                "description": "Proje düzeyi API anahtarı. Tüm isteklerde 'X-API-KEY' başlığı gerektirir.",
+                "name": "X-API-KEY",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Kimlik Doğrulama İşlemleri",
+            "description": "Kimlik doğrulama işlemleri: kayıt, giriş, token yenileme vs."
+        },
+        {
+            "name": "Meetings",
+            "description": "Toplantı planlama, kayıt & log yönetimi."
+        }
+    ]
+}
