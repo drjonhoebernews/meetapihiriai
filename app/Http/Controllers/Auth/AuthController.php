@@ -124,11 +124,7 @@ class AuthController extends Controller
 
             $fullName = $user->firstname . ' ' . $user->lastname;
 
-            Mail::send(new RegisterForm([
-                'name' => $fullName,
-                'email' => $request->email,
-                'message' => $request->message,
-            ]));
+
 
 
 
